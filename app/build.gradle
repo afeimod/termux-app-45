@@ -4,21 +4,21 @@ plugins {
 
 ext {
     // The packageVariant defines the bootstrap variant that will be included in the app APK.
-    // This must be supported by com.termux.shared.termux.TermuxBootstrap.PackageVariant or app will
+    // This must be supported by com.linbox.shared.Linbox.LinboxBootstrap.PackageVariant or app will
     // crash at startup.
     // Bootstrap of a different variant must not be manually installed by the user after app installation
     // by replacing $PREFIX since app code is dependant on the variant used to build the APK.
     // Currently supported values are: [ "apt-android-7" "apt-android-5" ]
-    packageVariant = System.getenv("TERMUX_PACKAGE_VARIANT") ?: "apt-android-7" // Default: "apt-android-7"
+    packageVariant = System.getenv("LINBOX_PACKAGE_VARIANT") ?: "apt-android-7" // Default: "apt-android-7"
 }
 
 android {
     compileSdkVersion project.properties.compileSdkVersion.toInteger()
     ndkVersion = System.getenv("JITPACK_NDK_VERSION") ?: project.properties.ndkVersion
-    def appVersionName = System.getenv("TERMUX_APP_VERSION_NAME") ?: ""
-    def apkVersionTag = System.getenv("TERMUX_APK_VERSION_TAG") ?: ""
-    def splitAPKsForDebugBuilds = System.getenv("TERMUX_SPLIT_APKS_FOR_DEBUG_BUILDS") ?: "1"
-    def splitAPKsForReleaseBuilds = System.getenv("TERMUX_SPLIT_APKS_FOR_RELEASE_BUILDS") ?: "0" // F-Droid does not support split APKs #1904
+    def appVersionName = System.getenv("LINBOX_APP_VERSION_NAME") ?: ""
+    def apkVersionTag = System.getenv("LINBOX_APK_VERSION_TAG") ?: ""
+    def splitAPKsForDebugBuilds = System.getenv("LINBOX_SPLIT_APKS_FOR_DEBUG_BUILDS") ?: "1"
+    def splitAPKsForReleaseBuilds = System.getenv("LINBOX_SPLIT_APKS_FOR_RELEASE_BUILDS") ?: "0" // F-Droid does not support split APKs #1904
 
     dependencies {
         implementation "androidx.annotation:annotation:1.3.0"
@@ -34,11 +34,11 @@ android {
         implementation "io.noties.markwon:recycler:$markwonVersion"
 
         implementation project(":terminal-view")
-        implementation project(":termux-shared")
+        implementation project(":Linbox-shared")
     }
 
     defaultConfig {
-        applicationId "com.termux"
+        applicationId "com.linbox"
         minSdkVersion project.properties.minSdkVersion.toInteger()
         targetSdkVersion project.properties.targetSdkVersion.toInteger()
         versionCode 118
@@ -47,16 +47,16 @@ android {
         if (appVersionName) versionName = appVersionName
         validateVersionName(versionName)
 
-        buildConfigField "String", "TERMUX_PACKAGE_VARIANT", "\"" + project.ext.packageVariant + "\"" // Used by TermuxApplication class
+        buildConfigField "String", "LINBOX_PACKAGE_VARIANT", "\"" + project.ext.packageVariant + "\"" // Used by LinboxApplication class
 
-        manifestPlaceholders.TERMUX_PACKAGE_NAME = "com.termux"
-        manifestPlaceholders.TERMUX_APP_NAME = "Termux"
-        manifestPlaceholders.TERMUX_API_APP_NAME = "Termux:API"
-        manifestPlaceholders.TERMUX_BOOT_APP_NAME = "Termux:Boot"
-        manifestPlaceholders.TERMUX_FLOAT_APP_NAME = "Termux:Float"
-        manifestPlaceholders.TERMUX_STYLING_APP_NAME = "Termux:Styling"
-        manifestPlaceholders.TERMUX_TASKER_APP_NAME = "Termux:Tasker"
-        manifestPlaceholders.TERMUX_WIDGET_APP_NAME = "Termux:Widget"
+        manifestPlaceholders.LINBOX_PACKAGE_NAME = "com.linbox"
+        manifestPlaceholders.LINBOX_APP_NAME = "Linbox"
+        manifestPlaceholders.LINBOX_API_APP_NAME = "Linbox:API"
+        manifestPlaceholders.LINBOX_BOOT_APP_NAME = "Linbox:Boot"
+        manifestPlaceholders.LINBOX_FLOAT_APP_NAME = "Linbox:Float"
+        manifestPlaceholders.LINBOX_STYLING_APP_NAME = "Linbox:Styling"
+        manifestPlaceholders.LINBOX_TASKER_APP_NAME = "Linbox:Tasker"
+        manifestPlaceholders.LINBOX_WIDGET_APP_NAME = "Linbox:Widget"
 
         externalNativeBuild {
             ndkBuild {
@@ -130,10 +130,10 @@ android {
         variant.outputs.all { output ->
             if (variant.buildType.name == "debug") {
                 def abi = output.getFilter(com.android.build.OutputFile.ABI)
-                outputFileName = new File("termux-app_" + (apkVersionTag ? apkVersionTag : project.ext.packageVariant + "-" + "debug") + "_" + (abi ? abi : "universal") + ".apk")
+                outputFileName = new File("Linbox-app_" + (apkVersionTag ? apkVersionTag : project.ext.packageVariant + "-" + "debug") + "_" + (abi ? abi : "universal") + ".apk")
             } else if (variant.buildType.name == "release") {
                 def abi = output.getFilter(com.android.build.OutputFile.ABI)
-                outputFileName = new File("termux-app_" + (apkVersionTag ? apkVersionTag : project.ext.packageVariant + "-" + "release") + "_" + (abi ? abi : "universal") + ".apk")
+                outputFileName = new File("Linbox-app_" + (apkVersionTag ? apkVersionTag : project.ext.packageVariant + "-" + "release") + "_" + (abi ? abi : "universal") + ".apk")
             }
         }
     }
@@ -182,7 +182,7 @@ def downloadBootstrap(String arch, String expectedChecksum, String version) {
         // }
     }
 
-    def remoteUrl = "https://github.com/ewt45/termux-app/releases/download/"+version+"/bootstrap-"+arch+".zip" //"https://github.com/ewt45/termux-app/releases/download/bootstrap-" + version + "/bootstrap-" + arch + ".zip"
+    def remoteUrl = "https://github.com/ewt45/Linbox-app/releases/download/"+version+"/bootstrap-"+arch+".zip" //"https://github.com/ewt45/Linbox-app/releases/download/bootstrap-" + version + "/bootstrap-" + arch + ".zip"
     logger.quiet("Downloading " + remoteUrl + " ...")
 
     file.parentFile.mkdirs()
@@ -231,7 +231,7 @@ task downloadBootstraps() {
             downloadBootstrap("i686", "46dcfeb5eef67ba765498db9fe4c50dc4690805139aa0dd141a9d8ee0693cd27", version)
             downloadBootstrap("x86_64", "615b590679ee6cd885b7fd2ff9473c845e920f9b422f790bb158c63fe42b8481", version)
         } else {
-            throw new GradleException("Unsupported TERMUX_PACKAGE_VARIANT \"" + packageVariant + "\"")
+            throw new GradleException("Unsupported LINBOX_PACKAGE_VARIANT \"" + packageVariant + "\"")
         }
     }
 }
